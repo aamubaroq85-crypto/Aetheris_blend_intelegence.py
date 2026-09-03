@@ -7,17 +7,17 @@ st.set_page_config(
     page_title="Aetheris Blend Intelligence", page_icon="🌿", layout="wide"
 )
 
-st.title("🌿 Aetheris Blend Intelligence ($\pi_{\text{eff}}$)")
+st.title("🌿 Aetheris Blend Intelligence (π_eff)")
 st.markdown(
     "Sistem cerdas perumusan racikan tembakau dan saus berbasis geometri"
-    " informasi molekuler dan *Zuhri Formalism*."
+    " informasi molekuler dan Zuhri Formalism."
 )
 
 # Sidebar: Pengaturan Target Output
 st.sidebar.header("🎯 Target Spesifikasi Produk")
 target_tar = st.sidebar.slider("Target Tar (mg/batang)", 1.0, 15.0, 10.0)
 target_nicotine = st.sidebar.slider("Target Nikotin (mg/batang)", 0.1, 1.5, 0.8)
-target_throat_hit = st.sidebar.slider("Indeks Throat Hit ($Th_{idx}$)", 1, 10, 7)
+target_throat_hit = st.sidebar.slider("Indeks Throat Hit (Th_idx)", 1, 10, 7)
 cost_limit = st.sidebar.number_input(
     "Maksimal Biaya Bahan Baku ($/kg)", value=45.0
 )
@@ -32,20 +32,20 @@ with col1:
   oriental_ratio = max(0, 100 - (virginia_ratio + burley_ratio))
   st.text(f"Proporsi Daun Oriental (Otomatis): {oriental_ratio}%")
 
-  casing_ph = st.slider("pH Larutan Saus ($pH_s$)", 4.0, 8.0, 5.5)
+  casing_ph = st.slider("pH Larutan Saus (pH_s)", 4.0, 8.0, 5.5)
   humectant_pct = st.slider("Rasio Humektan / Gliserol (%)", 2.0, 15.0, 8.0)
   combustion_temp = st.slider(
       "Estimasi Suhu Bakar (°C)", 600.0, 900.0, 750.0
   )
 
 with col2:
-  st.subheader("🔬 Analisis Viskositas Informasi & Kimia ($\pi_{\text{eff}}$)")
+  st.subheader("🔬 Analisis Viskositas Informasi & Kimia")
 
 
   def calculate_aetheris_blend(
       v_rat, b_rat, o_rat, ph, hum, temp, t_tar, t_nic, t_th
   ):
-    # Konstanta Efisiensi Geometri Fluks Molekuler (Zuhri Formalism)
+    # Konstanta Efisiensi Geometri Fluks Molekuler
     pi_eff = (
         (v_rat * 1.02 + b_rat * 1.15 + o_rat * 1.25)
         / 100
@@ -58,7 +58,7 @@ with col2:
         (v_rat * 0.12) + (b_rat * 0.16) + (o_rat * 0.21)
     ) / 100 * ph_factor
 
-    # Prediksi Output Kimia Berbasis Model Matriks $\pi_{\text{eff}}$
+    # Prediksi Output Kimia Berbasis Model Matriks
     predicted_tar = max(
         1.5,
         (
@@ -99,7 +99,7 @@ with col2:
     )
 
 
-  if st.button("Jalankan Optimasi AI Lanjutan ($\pi_{\text{eff}}$)", type="primary"):
+  if st.button("Jalankan Optimasi AI Lanjutan", type="primary"):
     (
         pi_val,
         e_score,
@@ -134,12 +134,11 @@ with col2:
     )
     m4.metric("Konsistensi", f"{c_idx:.1f}%")
 
-    # Detail Analisis Sifat Kimia
+    # Detail Analisis Sifat Kimia (Diperbaiki tanpa backslash mentah)
     st.info(
-        f"**Aetheris Intelligence Parameters:**\n"
-        f"- Konstanta Geometri ($\pi_{\text{eff}}$): **{pi_val:.4f}**\n"
-        f"- Viskositas Informasi Molekul ($\nu_i$): **{e_score:.4f}**\n"
-        f"- Kalibrasi pH Sahih: level pH {casing_ph}."
+        "Aetheris Intelligence Parameters:\n- Konstanta Geometri (pi_eff): "
+        f"{pi_val:.4f}\n- Viskositas Informasi Molekul (nu_i): "
+        f"{e_score:.4f}\n- Kalibrasi pH Sahih: level pH {casing_ph}."
     )
   else:
     st.info(
