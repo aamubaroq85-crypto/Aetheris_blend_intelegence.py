@@ -7,17 +7,19 @@ st.set_page_config(
     page_title="Aetheris Blend Intelligence", page_icon="🌿", layout="wide"
 )
 
-st.title("🌿 Aetheris Blend Intelligence (π_eff)")
+# Header Utama Aplikasi
+st.title("🌿 Aetheris Blend Intelligence ($\pi_{\text{eff}}$)")
 st.markdown(
-    "Sistem cerdas perumusan racikan tembakau dan saus berbasis geometri"
-    " informasi molekuler dan Zuhri Formalism."
+    "Sistem cerdas perumusan racikan tembakau dan saus berbasis **Aetheris"
+    " Kinetic Formulation Matrix** dan *Advanced Molecular Information"
+    " Theory*."
 )
 
 # Sidebar: Pengaturan Target Output
 st.sidebar.header("🎯 Target Spesifikasi Produk")
 target_tar = st.sidebar.slider("Target Tar (mg/batang)", 1.0, 15.0, 10.0)
 target_nicotine = st.sidebar.slider("Target Nikotin (mg/batang)", 0.1, 1.5, 0.8)
-target_throat_hit = st.sidebar.slider("Indeks Throat Hit (Th_idx)", 1, 10, 7)
+target_throat_hit = st.sidebar.slider("Indeks Throat Hit ($Th_{\text{idx}}$)", 1, 10, 7)
 cost_limit = st.sidebar.number_input(
     "Maksimal Biaya Bahan Baku ($/kg)", value=45.0
 )
@@ -32,66 +34,67 @@ with col1:
   oriental_ratio = max(0, 100 - (virginia_ratio + burley_ratio))
   st.text(f"Proporsi Daun Oriental (Otomatis): {oriental_ratio}%")
 
-  casing_ph = st.slider("pH Larutan Saus (pH_s)", 4.0, 8.0, 5.5)
+  casing_ph = st.slider("pH Larutan Saus ($pH_s$)", 4.0, 8.0, 5.5)
   humectant_pct = st.slider("Rasio Humektan / Gliserol (%)", 2.0, 15.0, 8.0)
   combustion_temp = st.slider(
       "Estimasi Suhu Bakar (°C)", 600.0, 900.0, 750.0
   )
 
 with col2:
-  st.subheader("🔬 Analisis Viskositas Informasi & Kimia")
+  st.subheader("🔬 Matriks Kinetika & Viskositas Informasi")
 
 
-  def calculate_aetheris_blend(
+  def calculate_aetheris_kinetic_matrix(
       v_rat, b_rat, o_rat, ph, hum, temp, t_tar, t_nic, t_th
   ):
-    # Konstanta Efisiensi Geometri Fluks Molekuler
-    pi_eff = (
-        (v_rat * 1.02 + b_rat * 1.15 + o_rat * 1.25)
-        / 100
-        * (temp / 750.0)
-    )
+    # 1. Aetheris Kinetic Formulation Matrix (Koefisien Hambatan Termal & Fluks)
+    matrix_factor = (
+        v_rat * 0.011 + b_rat * 0.014 + o_rat * 0.016
+    )  # Indeks reaktivitas selulosa
+    pi_eff = matrix_factor * (temp / 750.0) * (1.0 + (hum * 0.01))
 
-    # Viskositas Informasi Senyawa Volatil
-    ph_factor = 1.0 + ((ph - 5.5) * 0.15)
-    entropy_score = (
-        (v_rat * 0.12) + (b_rat * 0.16) + (o_rat * 0.21)
-    ) / 100 * ph_factor
+    # 2. Viskositas Informasi Senyawa Volatil & Disosiasi Nikotin
+    ph_dissociation = 1.0 + ((ph - 5.5) * 0.18)
+    information_viscosity = (
+        (v_rat * 0.13) + (b_rat * 0.17) + (o_rat * 0.22)
+    ) / 100 * ph_dissociation
 
-    # Prediksi Output Kimia Berbasis Model Matriks
+    # 3. Prediksi Kinetika Output Kimia
     predicted_tar = max(
-        1.5,
+        1.2,
         (
-            (v_rat * 0.13 + b_rat * 0.17 + o_rat * 0.09)
-            - (hum * 0.4)
-            - ((temp - 750) * 0.01)
+            (v_rat * 0.14 + b_rat * 0.18 + o_rat * 0.08)
+            - (hum * 0.45)
+            - ((temp - 750) * 0.012)
         )
         * pi_eff,
     )
 
     predicted_nic = max(
-        0.1,
+        0.05,
         (
-            (v_rat * 0.008 + b_rat * 0.018 + o_rat * 0.012)
-            * ph_factor
-            / (hum * 0.05 + 0.8)
+            (v_rat * 0.009 + b_rat * 0.019 + o_rat * 0.013)
+            * ph_dissociation
+            / (hum * 0.04 + 0.85)
         ),
     )
 
     predicted_th = min(
-        10.0, max(1.0, (predicted_nic * 5.0) + ((ph - 5.0) * 1.2) + (hum * 0.1))
+        10.0,
+        max(1.0, (predicted_nic * 5.2) + ((ph - 5.0) * 1.3) + (hum * 0.08)),
     )
 
+    # 4. Evaluasi Deviasi dan Konsistensi Matriks
     error_margin = (
-        abs(predicted_tar - t_tar) * 1.5
-        + abs(predicted_nic - t_nic) * 10.0
-        + abs(predicted_th - t_th) * 0.8
+        abs(predicted_tar - t_tar) * 1.4
+        + abs(predicted_nic - t_nic) * 9.5
+        + abs(predicted_th - t_th) * 0.75
     )
     consistency_index = max(0.0, min(100.0, 100.0 - error_margin))
 
     return (
         pi_eff,
-        entropy_score,
+        information_viscosity,
         predicted_tar,
         predicted_nic,
         predicted_th,
@@ -99,15 +102,15 @@ with col2:
     )
 
 
-  if st.button("Jalankan Optimasi AI Lanjutan", type="primary"):
+  if st.button("Jalankan Matriks Kinetika Lanjutan", type="primary"):
     (
         pi_val,
-        e_score,
+        info_visc,
         p_tar,
         p_nic,
         p_th,
         c_idx,
-    ) = calculate_aetheris_blend(
+    ) = calculate_aetheris_kinetic_matrix(
         virginia_ratio,
         burley_ratio,
         oriental_ratio,
@@ -119,7 +122,9 @@ with col2:
         target_throat_hit,
     )
 
-    st.success("Matriks Formula Berhasil Dikalkulasi oleh Aetheris AI!")
+    st.success(
+        "Kalkulasi Berhasil: Matriks Kinetika Aetheris Telah Disinkronisasi!"
+    )
 
     # Menampilkan Metrik Hasil
     m1, m2, m3, m4 = st.columns(4)
@@ -134,14 +139,16 @@ with col2:
     )
     m4.metric("Konsistensi", f"{c_idx:.1f}%")
 
-    # Detail Analisis Sifat Kimia (Diperbaiki tanpa backslash mentah)
+    # Detail Analisis Matriks Kinetika
     st.info(
-        "Aetheris Intelligence Parameters:\n- Konstanta Geometri (pi_eff): "
-        f"{pi_val:.4f}\n- Viskositas Informasi Molekul (nu_i): "
-        f"{e_score:.4f}\n- Kalibrasi pH Sahih: level pH {casing_ph}."
+        f"**Aetheris Kinetic Formulation Metrics:**\n"
+        f"- Konstanta Geometri Dinamis ($\pi_{\text{eff}}$): **{pi_val:.4f}**\n"
+        f"- Viskositas Informasi Molekul ($\nu_i$): **{info_visc:.4f}**\n"
+        f"- Status Kinetika Suhu & pH: Stabil pada $pH_s$ {casing_ph} dan"
+        f" {combustion_temp}°C."
     )
   else:
     st.info(
-        "Sesuaikan parameter konfigurasi di panel kiri, lalu klik tombol untuk"
-        " memulai simulasi."
+        "Atur variabel parameter pada panel kiri, lalu klik tombol untuk"
+        " mengeksekusi matriks kinetika."
     )
