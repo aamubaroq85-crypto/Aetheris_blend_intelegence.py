@@ -124,9 +124,17 @@ with menu_tab[0]:
     st.markdown("##### Komposisi Proporsi Tembakau Nusantara (%)")
     virginia_ratio = st.slider("Virginia Leaf (%)", 0, 100, 40)
     temanggung_ratio = st.slider(
-        "Temanggung Local (Aromatic/Srintil) (%)", 0, 100, 25
+        "Temanggung Local (Aromatic/Srintil) (%)",
+        0,
+        100 - virginia_ratio,
+        25,
     )
-    madura_ratio = st.slider("Madura / Kasturi (Pungent) (%)", 0, 100, 20)
+    madura_ratio = st.slider(
+        "Madura / Kasturi (Pungent) (%)",
+        0,
+        100 - (virginia_ratio + temanggung_ratio),
+        20,
+    )
     besuki_ratio = max(
         0, 100 - (virginia_ratio + temanggung_ratio + madura_ratio)
     )
@@ -229,48 +237,10 @@ with menu_tab[0]:
       )
 
 
-    pi_val, info_visc, p_tar, p_nic, p_th, c_idx, total_cost = (
-        calculate_enterprise_matrix(
-            virginia_ratio,
-            temanggung_ratio,
-            madura_ratio,
-            besuki_ratio,
-            casing_ph,
-            humectant_pct,
-            combustion_temp,
-            target_tar,
-            target_nicotine,
-            target_throat_hit,
-        )
-    )
-
-    m1, m2, m3, m4 = st.columns(4)
-    m1.metric("Tar", f"{p_tar:.2f} mg")
-    m2.metric("Nikotin", f"{p_nic:.2f} mg")
-    m3.metric("Throat Hit", f"{p_th:.1f}/10")
-    m4.metric("Konsistensi", f"{c_idx:.1f}%")
-
-    st.info(
-        f"**Analisis Kinetika & Finansial Industri:**\n"
-        f"- Konstanta Geometri (pi_eff): **{pi_val:.4f}**\n"
-        f"- Viskositas Informasi (nu_i): **{info_visc:.4f}**\n"
-        f"- Estimasi Biaya Bahan Baku: **${total_cost:.2f} / kg**"
-    )
-
-    blend_name_input = st.text_input(
-        "Nama Batch / Kode Formula", "Blend_Nusantara_Alpha_01"
-    )
-    if st.button("💾 Simpan Formula ke Database Rahasia"):
-      conn = sqlite3.connect("aetheris_enterprise.db")
-      cursor = conn.cursor()
-      cursor.execute(
-          """
-                INSERT INTO recipes (blend_name, author, virginia, temanggung, madura, besuki, casing_ph, humectant, temp, estimated_tar, estimated_nic, throat_hit, consistency, total_cost, created_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """,
-          (
-              blend_name_input,
-              st.session_state["username"],
+    # Tombol Eksekusi Optimasi / Matriks Kinetika
+    if st.button("⚡ Jalankan Matriks Kinetika & Optimasi", type="primary"):
+      pi_val, info_visc, p_tar, p_nic, p_th, c_idx, total_cost = (
+          calculate_enterprise_matrix(
               virginia_ratio,
               temanggung_ratio,
               madura_ratio,
@@ -278,19 +248,78 @@ with menu_tab[0]:
               casing_ph,
               humectant_pct,
               combustion_temp,
-              p_tar,
-              p_nic,
-              p_th,
-              c_idx,
-              total_cost,
-              datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-          ),
+              target_tar,
+              target_nicotine,
+              target_throat_hit,
+          )
       )
-      conn.commit()
-      conn.close()
-      st.success(
-          f"Formula '{blend_name_input}' berhasil disimpan ke database"
-          " perusahaan yang aman!"
+
+      st.success("Simulasi Matriks Kinetika Berhasil Dijalankan!")
+
+      m1, m2, m3, m4 = st.columns(4)
+      m1.metric("Tar", f"{p_tar:.2f} mg")
+      m2.metric("Nikotin", f"{p_nic:.2f} mg")
+      m3.metric("Throat Hit", f"{p_th:.1f}/10")
+      m4.metric("Konsistensi", f"{c_idx:.1f}%")
+
+      st.info(
+          f"**Analisis Kinetika & Finansial Industri:**\n"
+          f"- Konstanta Geometri (pi_eff): **{pi_val:.4f}**\n"
+          f"- Viskositas Informasi (nu_i): **{info_visc:.4f}**\n"
+          f"- Estimasi Biaya Bahan Baku: **${total_cost:.2f} / kg**"
+      )
+
+      # Simpan ke session state agar bisa disimpan ke DB setelah tombol diklik
+      st.session_state["last_run"] = {
+          "p_tar": p_tar,
+          "p_nic": p_nic,
+          "p_th": p_th,
+          "c_idx": c_idx,
+          "total_cost": total_cost,
+      }
+
+    if "last_run" in st.session_state:
+      st.markdown("---")
+      blend_name_input = st.text_input(
+          "Nama Batch / Kode Formula", "Blend_Nusantara_Alpha_01"
+      )
+      if st.button("💾 Simpan Formula ke Database Rahasia"):
+        res = st.session_state["last_run"]
+        conn = sqlite3.connect("aetheris_enterprise.db")
+        cursor = conn.cursor()
+        cursor.execute(
+            """
+                    INSERT INTO recipes (blend_name, author, virginia, temanggung, madura, besuki, casing_ph, humectant, temp, estimated_tar, estimated_nic, throat_hit, consistency, total_cost, created_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+            (
+                blend_name_input,
+                st.session_state["username"],
+                virginia_ratio,
+                temanggung_ratio,
+                madura_ratio,
+                besuki_ratio,
+                casing_ph,
+                humectant_pct,
+                combustion_temp,
+                res["p_tar"],
+                res["p_nic"],
+                res["p_th"],
+                res["c_idx"],
+                res["total_cost"],
+                datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            ),
+        )
+        conn.commit()
+        conn.close()
+        st.success(
+            f"Formula '{blend_name_input}' berhasil disimpan ke database"
+            " perusahaan yang aman!"
+        )
+    else:
+      st.info(
+          "Klik tombol '⚡ Jalankan Matriks Kinetika & Optimasi' di atas untuk"
+          " melihat hasil kalkulasi."
       )
 
 with menu_tab[1]:
